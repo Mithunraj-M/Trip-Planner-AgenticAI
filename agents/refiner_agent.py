@@ -5,7 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_models import ChatOpenAI
 
-# Load environment variables
+
 load_dotenv()
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
 
@@ -17,9 +17,7 @@ DEFAULT_LLM = ChatOpenAI(
     max_tokens=300
 )
 
-# -------------------------------
-# 🔹 Sub-Prompt 1: Removal Detector
-# -------------------------------
+
 def get_removal_chain(llm):
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are a task deduplicator for a travel planning agent.
@@ -32,9 +30,7 @@ Return only a Python list of task strings to remove:
     ])
     return prompt | llm | StrOutputParser()
 
-# -------------------------------
-# 🔹 Sub-Prompt 2: Follow-Up Suggester
-# -------------------------------
+
 def get_addition_chain(llm):
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are a follow-up suggester for a travel planner.
@@ -47,9 +43,7 @@ Return only a Python list:
     ])
     return prompt | llm | StrOutputParser()
 
-# -------------------------------
-# 🔹 Sub-Prompt 3: Assumption Extractor
-# -------------------------------
+
 def get_assumption_chain(llm):
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are an assumption extractor for a task refinement agent.
@@ -61,9 +55,7 @@ Return a Python list:
     ])
     return prompt | llm | StrOutputParser()
 
-# -------------------------------
-# 🔁 Main Refiner Node
-# -------------------------------
+
 def refiner_node(state: dict) -> dict:
     goal = state.get("user_goal", "")
     history = state.get("history", [])
@@ -72,10 +64,10 @@ def refiner_node(state: dict) -> dict:
     llm = state.get("llm", DEFAULT_LLM)
 
     if refinement_count >= 3:
-        print("🔁 Max refinement limit reached. Skipping.")
+        print(" Max refinement limit reached. Skipping.")
         return {**state, "refined": False, "reason": "Max iterations reached"}
 
-    # Update invocation count
+    
     state["refinement_count"] = refinement_count + 1
 
     removal_chain = get_removal_chain(llm)
@@ -89,53 +81,53 @@ def refiner_node(state: dict) -> dict:
     for task, output, tool in history:
         task_queue_str = "\n".join(f"- {t}" for t in task_queue)
 
-        print("\n🚀 Invoking LLM with:")
-        print("🧩 Task:", task)
-        print("📤 Output:", output)
-        print("🔧 Tool:", tool)
-        print("📋 Task Queue:\n", task_queue_str)
+        print("\n Invoking LLM with:")
+        print("Task:", task)
+        print("Output:", output)
+        print("Tool:", tool)
+        print("Task Queue:\n", task_queue_str)
 
-        # 🔍 Removals
+        
         try:
             to_remove_raw = removal_chain.invoke({
                 "task": task,
                 "task_queue": task_queue_str
             })
-            print("🧾 Removals Raw:", to_remove_raw)
+            print(" Removals Raw:", to_remove_raw)
             to_remove = ast.literal_eval(to_remove_raw)
             for t in to_remove:
                 if t in task_queue:
                     task_queue.remove(t)
                     removed.append(t)
         except Exception as e:
-            print("⚠️ Removal failed:", e)
+            print(" Removal failed:", e)
 
-        # ➕ Additions
+       
         try:
             to_add_raw = addition_chain.invoke({
                 "task": task,
                 "output": output,
                 "goal": goal
             })
-            print("➕ Additions Raw:", to_add_raw)
+            print("Additions Raw:", to_add_raw)
             to_add = ast.literal_eval(to_add_raw)
             for t in to_add:
                 if t not in task_queue:
                     task_queue.append(t)
                     added.append(t)
         except Exception as e:
-            print("⚠️ Addition failed:", e)
+            print("Addition failed:", e)
 
-        # 💭 Assumptions
+       
         try:
             assumptions_raw = assumption_chain.invoke({
                 "task": task,
                 "output": output
             })
-            print("💭 Assumptions Raw:", assumptions_raw)
+            print("Assumptions Raw:", assumptions_raw)
             assumptions.extend(ast.literal_eval(assumptions_raw))
         except Exception as e:
-            print("⚠️ Assumption extraction failed:", e)
+            print("Assumption extraction failed:", e)
 
     return {
         **state,
@@ -146,9 +138,7 @@ def refiner_node(state: dict) -> dict:
         "assumptions": assumptions
     }
 
-# -------------------------------
-# ✅ Sample Test
-# -------------------------------
+
 if __name__ == "__main__":
     dummy_state = {
         "user_goal": "Plan a trip to Manali under ₹10,000",
@@ -169,7 +159,7 @@ if __name__ == "__main__":
 
     result = refiner_node(dummy_state)
 
-    print("\n🎯 Final Refined Tasks:", result.get("task_queue"))
-    print("🗑️ Removed Tasks:", result.get("removed_tasks"))
-    print("➕ Added Tasks:", result.get("added_tasks"))
-    print("🤔 Assumptions:", result.get("assumptions"))
+    print("\n Final Refined Tasks:", result.get("task_queue"))
+    print("Removed Tasks:", result.get("removed_tasks"))
+    print("Added Tasks:", result.get("added_tasks"))
+    print("Assumptions:", result.get("assumptions"))

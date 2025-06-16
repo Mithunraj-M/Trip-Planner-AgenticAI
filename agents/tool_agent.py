@@ -7,7 +7,7 @@ from langchain.agents import Tool, initialize_agent
 from langchain_community.chat_models import ChatOpenAI
 project_root = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_root))
-# 🔧 Import your custom tools
+
 from tools.tools import (
     serpapi_search,
     google_places,
@@ -15,15 +15,11 @@ from tools.tools import (
     map_distance,
 )
 
-# -------------------------------------
-# 🔐 Load environment variables from .env
-# -------------------------------------
+
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-# -------------------------------------
-# 🔑 OpenRouter API setup
-# -------------------------------------
+
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_KEY:
     raise ValueError("Missing OPENROUTER_API_KEY in .env file")
@@ -31,9 +27,7 @@ if not OPENROUTER_KEY:
 openai.api_key = OPENROUTER_KEY
 openai.api_base = "https://openrouter.ai/api/v1"
 
-# -------------------------------------
-# 🛠 Register tools using LangChain Tool API
-# -------------------------------------
+
 tools = [
     Tool.from_function(
         name="WebSearch",
@@ -57,9 +51,7 @@ tools = [
     ),
 ]
 
-# -------------------------------------
-# 💬 Create the LLM for the agent
-# -------------------------------------
+
 llm = ChatOpenAI(
     openai_api_key=OPENROUTER_KEY,
     base_url="https://openrouter.ai/api/v1",
@@ -67,9 +59,7 @@ llm = ChatOpenAI(
     temperature=0.2,
 )
 
-# -------------------------------------
-# 🧠 LangChain ReAct-style tool-using agent
-# -------------------------------------
+
 tool_agent = initialize_agent(
     tools=tools,
     llm=llm,
@@ -79,9 +69,7 @@ tool_agent = initialize_agent(
      
 )
 
-# -------------------------------------
-# 🔁 LangGraph-compatible tool executor node
-# -------------------------------------
+
 def tool_executor_node(state):
     task_queue = state.get("task_queue", [])
     history = state.get("history", [])
@@ -94,17 +82,17 @@ def tool_executor_node(state):
             "current_task": None,
         }
 
-    # Pop the next task from the queue
+    
     current_task = task_queue.pop(0)
 
     try:
-        # Run the tool agent
+        
         result = tool_agent.invoke(
             {"input": current_task},
             config={"callbacks": [], "tags": [], "metadata": {}, "run_name": "ToolExecutor"}
         )
 
-        # Extract intermediate steps and identify which tool was used
+        
         tool_used = "unknown"
         steps = result.get("intermediate_steps", [])
         print("Intermediate Steps:", steps)
@@ -134,10 +122,10 @@ def tool_executor_node(state):
             "history": history + [(current_task, f"Error: {e}", "error")],
         }
 
-
+#sample for testing unit functionality
 
 if __name__ == "__main__":
-    # 🏔️ Sample Manali trip planning state
+    
     test_state = {
         "task_queue": [
             "Find budget hotels in Manali for 3 nights",
@@ -150,13 +138,13 @@ if __name__ == "__main__":
         "history": []
     }
 
-    # 🔁 Run each task one by one using the tool agent
+    
     while test_state["task_queue"]:
         test_state = tool_executor_node(test_state)
 
-    # 🧾 Final output
-    print("\n✅ Final History:")
+    
+    print("\n Final History:")
     for i, (task, output, tool) in enumerate(test_state.get("history", []), 1):
-        print(f"{i}. 🔹 Task: {task}")
-        print(f"   🛠 Tool Used: {tool}")
-        print(f"   📤 Output: {output}\n")
+        print(f"{i}. Task: {task}")
+        print(f"  Tool Used: {tool}")
+        print(f"  Output: {output}\n")

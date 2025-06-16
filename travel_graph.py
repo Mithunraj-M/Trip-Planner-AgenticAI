@@ -1,4 +1,3 @@
-# graph_runner.py
 
 from langgraph.graph import StateGraph, END
 from agents.planner_agent import planner_node
@@ -22,7 +21,7 @@ MAX_ITERATIONS = 3
 def should_continue(state):
     return "continue" if state.get("task_queue") and state.get("iteration_count", 0) < MAX_ITERATIONS else "stop"
 
-# Build and compile the graph
+
 def build_graph():
     builder = StateGraph(TravelPlannerState)
     builder.add_node("planner", planner_node)
@@ -37,7 +36,7 @@ def build_graph():
     builder.add_conditional_edges("refiner", should_continue, {"continue": "tool", "stop": END})
     return builder.compile()
 
-# Main function to call from API
+
 def run_travel_planner(user_input: str):
     graph = build_graph()
     initial_state = {"user_goal": user_input, "iteration_count": 0}
