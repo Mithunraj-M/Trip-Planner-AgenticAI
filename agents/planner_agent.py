@@ -46,7 +46,7 @@ Return only a numbered list of subtasks.
             output = response["choices"][0]["message"]["content"]
             lines = output.strip().splitlines()
 
-            # Extract tasks from lines like "1. Find hotels"
+            
             tasks = [
                 line.split(".", 1)[1].strip()
                 for line in lines

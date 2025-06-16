@@ -8,6 +8,7 @@ from langchain_community.chat_models import ChatOpenAI
 project_root = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_root))
 
+
 from tools.tools import (
     serpapi_search,
     google_places,
@@ -16,8 +17,10 @@ from tools.tools import (
 )
 
 
+
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
+
 
 
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -26,6 +29,7 @@ if not OPENROUTER_KEY:
 
 openai.api_key = OPENROUTER_KEY
 openai.api_base = "https://openrouter.ai/api/v1"
+
 
 
 tools = [
@@ -52,12 +56,14 @@ tools = [
 ]
 
 
+
 llm = ChatOpenAI(
     openai_api_key=OPENROUTER_KEY,
     base_url="https://openrouter.ai/api/v1",
     model="gpt-3.5-turbo",
     temperature=0.2,
 )
+
 
 
 tool_agent = initialize_agent(
@@ -68,6 +74,7 @@ tool_agent = initialize_agent(
     return_intermediate_steps=True,
      
 )
+
 
 
 def tool_executor_node(state):
@@ -83,15 +90,18 @@ def tool_executor_node(state):
         }
 
     
+    
     current_task = task_queue.pop(0)
 
     try:
+        
         
         result = tool_agent.invoke(
             {"input": current_task},
             config={"callbacks": [], "tags": [], "metadata": {}, "run_name": "ToolExecutor"}
         )
 
+        
         
         tool_used = "unknown"
         steps = result.get("intermediate_steps", [])
@@ -122,9 +132,10 @@ def tool_executor_node(state):
             "history": history + [(current_task, f"Error: {e}", "error")],
         }
 
-
+#sample for testing unit functionality
 
 if __name__ == "__main__":
+    
     
     test_state = {
         "task_queue":[
@@ -139,9 +150,12 @@ if __name__ == "__main__":
     }
 
     
+    
     while test_state["task_queue"]:
         test_state = tool_executor_node(test_state)
 
+    
+    print("\n Final History:")
     
     print("\n Final History:")
     for i, (task, output, tool) in enumerate(test_state.get("history", []), 1):

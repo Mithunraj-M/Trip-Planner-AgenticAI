@@ -23,6 +23,7 @@ def should_continue(state):
     return "continue" if state.get("task_queue") and state.get("iteration_count", 0) < MAX_ITERATIONS else "stop"
 
 
+
 def build_graph():
     builder = StateGraph(TravelPlannerState)
     builder.add_node("planner", planner_node)
@@ -36,6 +37,7 @@ def build_graph():
     builder.add_edge("tool", "refiner")
     builder.add_conditional_edges("refiner", should_continue, {"continue": "tool", "stop": END})
     return builder.compile()
+
 
 
 def run_travel_planner(user_input: str):

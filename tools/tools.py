@@ -7,9 +7,11 @@ from serpapi import GoogleSearch
 from dotenv import load_dotenv
 
 
+
 from pathlib import Path
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
+
 
 
 SERPAPI_KEY = os.getenv("SERPAPI_API_KEY")
@@ -19,12 +21,15 @@ EXCHANGE_RATE_KEY = os.getenv("EXCHANGE_RATE_API_KEY")
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
 
 
+
 openai.api_key = OPENROUTER_KEY
 openai.api_base = "https://openrouter.ai/api/v1"
 
 
+
 gmaps_places = googlemaps.Client(key=GOOGLE_PLACES_KEY)
 gmaps_maps = googlemaps.Client(key=GOOGLE_MAPS_KEY)
+
 
 
 def serpapi_search(query: str) -> str:
@@ -41,6 +46,7 @@ def serpapi_search(query: str) -> str:
         return f"[SerpAPI Error] {e}"
 
 
+
 def google_places(query: str) -> str:
     try:
         result = gmaps_places.find_place(
@@ -51,6 +57,7 @@ def google_places(query: str) -> str:
         return str(result)
     except Exception as e:
         return f"[Google Places Error] {e}"
+
 
 
 def map_distance(task: str) -> str:
@@ -89,6 +96,7 @@ Respond only in this format: Source=SourceCity, Destination=DestinationCity
 
 
 
+
 def smart_currency_conversion(task: str) -> str:
     try:
         
@@ -97,6 +105,7 @@ def smart_currency_conversion(task: str) -> str:
             return "Couldn't extract amount."
         amount = float(amount_match.group(1).replace(",", ""))
 
+        
         
         prompt = f"""
 You are given a user task: "{task}"
@@ -112,6 +121,7 @@ Respond only in this format: Currency=currency code, Destination=destination cit
         currency_code = reply.split("Currency=")[1].split(",")[0].strip().upper()
         destination = reply.split("Destination=")[1].strip()
 
+        
         
         url = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_RATE_KEY}/pair/{currency_code}/INR/{amount}"
         response = requests.get(url).json()

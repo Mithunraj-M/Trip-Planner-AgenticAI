@@ -6,6 +6,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_models import ChatOpenAI
 
 
+
 load_dotenv()
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
 
@@ -16,6 +17,7 @@ DEFAULT_LLM = ChatOpenAI(
     temperature=0.3,
     max_tokens=300
 )
+
 
 
 def get_removal_chain(llm):
@@ -31,6 +33,7 @@ Return only a Python list of task strings to remove:
     return prompt | llm | StrOutputParser()
 
 
+
 def get_addition_chain(llm):
     prompt = ChatPromptTemplate.from_messages([
         ("system", """You are a follow-up suggester for a travel planner.
@@ -42,6 +45,7 @@ Return only a Python list:
         ("human", "Completed Task: {task}\nOutput:\n{output}\nGoal: {goal}")
     ])
     return prompt | llm | StrOutputParser()
+
 
 
 def get_assumption_chain(llm):
@@ -56,6 +60,7 @@ Return a Python list:
     return prompt | llm | StrOutputParser()
 
 
+
 def refiner_node(state: dict) -> dict:
     goal = state.get("user_goal", "")
     history = state.get("history", [])
@@ -64,9 +69,10 @@ def refiner_node(state: dict) -> dict:
     llm = state.get("llm", DEFAULT_LLM)
 
     if refinement_count >= 3:
-        print("🔁 Max refinement limit reached. Skipping.")
+        print(" Max refinement limit reached. Skipping.")
         return {**state, "refined": False, "reason": "Max iterations reached"}
 
+    
     
     state["refinement_count"] = refinement_count + 1
 
@@ -88,11 +94,13 @@ def refiner_node(state: dict) -> dict:
         print(" Task Queue:\n", task_queue_str)
 
         
+        
         try:
             to_remove_raw = removal_chain.invoke({
                 "task": task,
                 "task_queue": task_queue_str
             })
+            print(" Removals Raw:", to_remove_raw)
             print(" Removals Raw:", to_remove_raw)
             to_remove = ast.literal_eval(to_remove_raw)
             for t in to_remove:
@@ -137,6 +145,7 @@ def refiner_node(state: dict) -> dict:
         "added_tasks": added,
         "assumptions": assumptions
     }
+
 
 
 if __name__ == "__main__":
