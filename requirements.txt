@@ -2,3 +2,8 @@ fastapi
 uvicorn
 langgraph
 pydantic
+langchain
+openai
+langchain_community
+serpapi
+googlemaps
