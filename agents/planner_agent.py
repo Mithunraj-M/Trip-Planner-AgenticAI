@@ -45,6 +45,7 @@ Return only a numbered list of subtasks.
                 model=self.llm_model,
                 messages=prompt,
                 temperature=0.2,
+                max_tokens=500
             )
             output = response["choices"][0]["message"]["content"]
             lines = output.strip().splitlines()
