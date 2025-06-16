@@ -6,37 +6,27 @@ import openai
 from serpapi import GoogleSearch
 from dotenv import load_dotenv
 
-# ------------------------------
-# 🔐 Load .env from root
-# ------------------------------
+
 from pathlib import Path
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-# ------------------------------
-# 🔑 API Keys
-# ------------------------------
+
 SERPAPI_KEY = os.getenv("SERPAPI_API_KEY")
 GOOGLE_PLACES_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 GOOGLE_MAPS_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 EXCHANGE_RATE_KEY = os.getenv("EXCHANGE_RATE_API_KEY")
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
 
-# ------------------------------
-# 🔧 Setup OpenRouter
-# ------------------------------
+
 openai.api_key = OPENROUTER_KEY
 openai.api_base = "https://openrouter.ai/api/v1"
 
-# ------------------------------
-# 📍 Google Maps Clients
-# ------------------------------
+
 gmaps_places = googlemaps.Client(key=GOOGLE_PLACES_KEY)
 gmaps_maps = googlemaps.Client(key=GOOGLE_MAPS_KEY)
 
-# ------------------------------
-# 🔎 1. Web Search via SerpAPI
-# ------------------------------
+
 def serpapi_search(query: str) -> str:
     try:
         params = {
@@ -50,9 +40,7 @@ def serpapi_search(query: str) -> str:
     except Exception as e:
         return f"[SerpAPI Error] {e}"
 
-# ------------------------------
-# 🗺️ 2. Google Places Search
-# ------------------------------
+
 def google_places(query: str) -> str:
     try:
         result = gmaps_places.find_place(
@@ -64,9 +52,7 @@ def google_places(query: str) -> str:
     except Exception as e:
         return f"[Google Places Error] {e}"
 
-# ------------------------------
-# 🛣️ 3. Map Distance Extraction + LLM
-# ------------------------------
+
 def map_distance(task: str) -> str:
     try:
         prompt = f"""
@@ -75,7 +61,7 @@ Extract the source and destination cities for calculating distance.
 Respond only in this format: Source=CityA, Destination=CityB
 """
         resp = openai.ChatCompletion.create(
-            model="mistralai/mistral-7b-instruct",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You extract cities from travel tasks."},
                 {"role": "user", "content": prompt}
@@ -102,25 +88,23 @@ Respond only in this format: Source=CityA, Destination=CityB
         return f"[Distance Error] {e}"
 
 
-# ------------------------------
-# 💱 4. Currency Conversion
-# ------------------------------
+
 def smart_currency_conversion(task: str) -> str:
     try:
-        # 1. Extract amount
+        
         amount_match = re.search(r"(\d+(?:,\d{3})*(?:\.\d+)?)", task)
         if not amount_match:
             return "Couldn't extract amount."
         amount = float(amount_match.group(1).replace(",", ""))
 
-        # 2. Extract currency and destination using LLM
+        
         prompt = f"""
 You are given a user task: "{task}"
 Identify the base currency (e.g., USD, EUR) and the destination country or city.
 Respond only in this format: Currency=XXX, Destination=YYY
 """
         resp = openai.ChatCompletion.create(
-            model="mistralai/mistral-7b-instruct",
+            model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0
         )
@@ -128,7 +112,7 @@ Respond only in this format: Currency=XXX, Destination=YYY
         currency_code = reply.split("Currency=")[1].split(",")[0].strip().upper()
         destination = reply.split("Destination=")[1].strip()
 
-        # 3. Convert using ExchangeRate API
+        
         url = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_RATE_KEY}/pair/{currency_code}/INR/{amount}"
         response = requests.get(url).json()
 
