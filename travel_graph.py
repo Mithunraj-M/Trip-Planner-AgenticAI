@@ -39,6 +39,7 @@ def build_graph():
 
 
 def run_travel_planner(user_input: str):
+    
     graph = build_graph()
     initial_state = {"user_goal": user_input, "iteration_count": 0}
     final_result = graph.invoke(initial_state)
@@ -55,10 +56,10 @@ def run_travel_planner(user_input: str):
         history = final_state.get("history", [])
 
     
-    user_goal = user_input.lower()
-    filtered = []
-    for task, result, tool in final_state.get("history", []):
-        if "manali" in task.lower() or any(word in task.lower() for word in user_goal.split()):
-            filtered.append({"task": task, "result": result, "tool": tool})
+    return {
+    "plan": [
+        {"task": task, "result": result, "tool": tool}
+        for task, result, tool in final_state.get("history", [])
+    ]
+}
 
-    return {"plan": filtered}

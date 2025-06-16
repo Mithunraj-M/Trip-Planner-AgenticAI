@@ -127,14 +127,14 @@ def tool_executor_node(state):
 if __name__ == "__main__":
     
     test_state = {
-        "task_queue": [
-            "Find budget hotels in Manali for 3 nights",
-            "Compare bus and taxi services from Bhuntar to Manali",
-            "List free or cheap tourist attractions in Manali",
-            "Find the currency exchange rate from INR to EUR",
-            "Search for local events or festivals in Manali in July",
-            "Find the distance from Kullu to Manali by road"
-        ],
+        "task_queue":[
+    "Find budget hotels in Sydney for 5 nights",
+    "Compare flight options from Delhi to Sydney, including layovers and prices",
+    "List free or cheap tourist attractions in Sydney and Melbourne",
+    "Search for local events or festivals happening in Australia in July",
+    "Find the distance from Melbourne to Sydney by road and air",
+    "Find the average cost of travel in sydney"
+],
         "history": []
     }
 

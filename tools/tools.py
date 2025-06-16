@@ -57,8 +57,8 @@ def map_distance(task: str) -> str:
     try:
         prompt = f"""
 You are given a user task: "{task}"
-Extract the source and destination cities for calculating distance.
-Respond only in this format: Source=CityA, Destination=CityB
+Extract the source and destination cities from the task for calculating distance.
+Respond only in this format: Source=SourceCity, Destination=DestinationCity
 """
         resp = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -100,8 +100,8 @@ def smart_currency_conversion(task: str) -> str:
         
         prompt = f"""
 You are given a user task: "{task}"
-Identify the base currency (e.g., USD, EUR) and the destination country or city.
-Respond only in this format: Currency=XXX, Destination=YYY
+Identify the destination country or city and its base currency code (e.g., USD, EUR) .
+Respond only in this format: Currency=currency code, Destination=destination city or country
 """
         resp = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
