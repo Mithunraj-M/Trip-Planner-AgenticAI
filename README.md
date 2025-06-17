@@ -35,7 +35,6 @@ The Agent system is deployed on an AWS EC2 instance with a POST API for user inp
 
 - Receive output in responses in json format
 
-
 ## Tools Used by the Agents
 - WebSearch : serpapi api
 - GooglePlaces: googleplaces api
