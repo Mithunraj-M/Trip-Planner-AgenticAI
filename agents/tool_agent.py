@@ -24,6 +24,7 @@ load_dotenv(dotenv_path=env_path)
 
 
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
+print("tool agent openrouter key loaded:",OPENROUTER_KEY)
 if not OPENROUTER_KEY:
     raise ValueError("Missing OPENROUTER_API_KEY in .env file")
 
@@ -78,6 +79,7 @@ tool_agent = initialize_agent(
 
 
 def tool_executor_node(state):
+    print("tool executor node started")
     task_queue = state.get("task_queue", [])
     history = state.get("history", [])
 
@@ -112,7 +114,7 @@ def tool_executor_node(state):
                 if isinstance(step, tuple) and hasattr(step[0], "tool"):
                     tool_used = step[0].tool
                     break
-
+        print("tool agent output:",state)
         return {
             **state,
             "current_task": current_task,

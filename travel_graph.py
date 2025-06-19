@@ -41,7 +41,7 @@ def build_graph():
 
 
 def run_travel_planner(user_input: str):
-    
+    print("travel graph started")
     graph = build_graph()
     initial_state = {"user_goal": user_input, "iteration_count": 0}
     final_result = graph.invoke(initial_state)
@@ -57,7 +57,7 @@ def run_travel_planner(user_input: str):
         task_queue = final_state.get("task_queue", [])
         history = final_state.get("history", [])
 
-    
+    print(final_state)
     return {
     "plan": [
         {"task": task, "result": result, "tool": tool}

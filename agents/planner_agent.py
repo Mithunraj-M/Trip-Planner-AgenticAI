@@ -7,6 +7,7 @@ base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 load_dotenv(dotenv_path=os.path.join(base_dir, ".env"))
 
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
+print("planner openrouter key loaded:",OPENROUTER_KEY)
 if not OPENROUTER_KEY:
     raise ValueError("OPENROUTER_API_KEY not found in environment.")
 
@@ -58,6 +59,7 @@ Return only a numbered list of subtasks.
 
 
 def planner_node(state: dict) -> dict:
+    print("planner node started")
     planner = PlannerAgent()
     user_goal = state.get("user_goal", "")
     task_queue = planner.plan_tasks(user_goal)
@@ -72,7 +74,7 @@ def planner_node(state: dict) -> dict:
     
     state.setdefault("history", [])
     state.setdefault("refined", False)
-
+    print("planner output:",state)
     return state
 
 if __name__ == "__main__":

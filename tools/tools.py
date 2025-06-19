@@ -19,7 +19,10 @@ GOOGLE_PLACES_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 GOOGLE_MAPS_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 EXCHANGE_RATE_KEY = os.getenv("EXCHANGE_RATE_API_KEY")
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
-
+print("Loaded OpenAI Key:", OPENROUTER_KEY)
+print("Loaded SerpAPI Key:", SERPAPI_KEY)
+print("Loaded Google Key:", GOOGLE_PLACES_KEY)
+print("Loaded currency:", EXCHANGE_RATE_KEY)
 
 
 openai.api_key = OPENROUTER_KEY

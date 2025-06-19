@@ -6,9 +6,9 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.chat_models import ChatOpenAI
 
 
-
 load_dotenv()
 OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
+print("refiner agent openrouter key loaded:",OPENROUTER_KEY)
 
 DEFAULT_LLM = ChatOpenAI(
     openai_api_key=OPENROUTER_KEY,
@@ -62,6 +62,7 @@ Return a Python list:
 
 
 def refiner_node(state: dict) -> dict:
+    print("refiner node startd")
     goal = state.get("user_goal", "")
     history = state.get("history", [])
     task_queue = state.get("task_queue", [])
@@ -136,7 +137,7 @@ def refiner_node(state: dict) -> dict:
             assumptions.extend(ast.literal_eval(assumptions_raw))
         except Exception as e:
             print(" Assumption extraction failed:", e)
-
+    print("refiner agent output:",state)
     return {
         **state,
         "task_queue": task_queue,

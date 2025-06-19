@@ -11,4 +11,5 @@ class TravelRequest(BaseModel):
 
 @app.post("/plan-trip")
 def plan_trip(request: TravelRequest):
+    print("main function started")
     return run_travel_planner(request.user_goal)
